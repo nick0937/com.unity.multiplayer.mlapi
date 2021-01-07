@@ -83,10 +83,7 @@ namespace MLAPI.AOI
             alwaysRelevant = new HashSet<OBJECT>();
 
             // when we are told an object is despawning, remove it from our list
-            OnDespawn = delegate(OBJECT o)
-            {
-                alwaysRelevant.Remove(o);
-            };
+            OnDespawn = Remove;
 
             // for our query, we simply union our static objects with the results
             //  more sophisticated methods might be explored later, like having the results

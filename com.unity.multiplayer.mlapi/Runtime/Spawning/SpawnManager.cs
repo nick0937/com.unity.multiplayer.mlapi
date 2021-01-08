@@ -686,7 +686,8 @@ namespace MLAPI.Spawning
             }
 
             GameObject go = sobj.gameObject;
-            NetworkingManager.Singleton.ClientObjMapNode.DespawnCleanup(go.GetComponent<NetworkedObject>());
+            NetworkedObject no = go.GetComponent<NetworkedObject>();
+            NetworkingManager.Singleton.ClientObjMapNode.DespawnCleanup(ref no);
 
             if (destroyGameObject && go != null)
             {

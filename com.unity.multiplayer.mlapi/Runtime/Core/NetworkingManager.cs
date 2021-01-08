@@ -196,10 +196,7 @@ namespace MLAPI
                 if (clientObjMapNode == null)
                 {
                     clientObjMapNode = new ClientObjMapNode<NetworkedClient, NetworkedObject>();
-                    clientObjMapNode.OnBypass = delegate(HashSet<NetworkedObject> results)
-                    {
-                        results.UnionWith(SpawnManager.SpawnedObjectsList);
-                    };
+                    clientObjMapNode.OnBypass = (HashSet<NetworkedObject> results) => results.UnionWith(SpawnManager.SpawnedObjectsList);
                     clientObjMapNode.Bypass = true;
                 }
 

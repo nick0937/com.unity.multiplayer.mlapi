@@ -389,7 +389,7 @@ namespace MLAPI
                     {
                         var client = NetworkingManager.Singleton.ConnectedClientsList[i];
 
-                        NetworkingManager.Singleton.ClientObjMapNode.QueryFor(client, touched);
+                        NetworkingManager.Singleton.ClientObjMapNode.QueryFor(ref client, touched);
                         foreach (var sobj in touched)
                         {
                             // Sync just the variables for just the objects this client sees

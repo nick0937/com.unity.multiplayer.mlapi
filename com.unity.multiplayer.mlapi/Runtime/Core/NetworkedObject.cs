@@ -408,14 +408,6 @@ namespace MLAPI
         }
 
         /// <summary>
-        /// Unspawns this GameObject and destroys it for other clients. This should be used if the object should be kept on the server
-        /// </summary>
-        public void UnSpawn()
-        {
-            SpawnManager.UnSpawnObject(this);
-        }
-
-        /// <summary>
         /// Spawns an object across the network with a given owner. Can only be called from server
         /// </summary>
         /// <param name="clientId">The clientId to own the object</param>
@@ -457,6 +449,14 @@ namespace MLAPI
                     SpawnManager.SendSpawnCallForObject(NetworkingManager.Singleton.ConnectedClientsList[i].ClientId, this, spawnPayload);
                 }
             }
+        }
+
+        /// <summary>
+        /// Unspawns this GameObject and destroys it for other clients. This should be used if the object should be kept on the server
+        /// </summary>
+        public void UnSpawn()
+        {
+            SpawnManager.UnSpawnObject(this);
         }
 
         /// <summary>

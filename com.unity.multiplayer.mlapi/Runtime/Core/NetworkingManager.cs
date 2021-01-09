@@ -594,6 +594,12 @@ namespace MLAPI
             Shutdown();
         }
 
+        public void ToggleClientObjectMap()
+        {
+            if (NetworkLog.CurrentLogLevel <= LogLevel.Developer) NetworkLog.LogInfo("ToggleClientObjectMap()");
+            Singleton.ClientObjMapNode.Bypass = !Singleton.ClientObjMapNode.Bypass;
+        }
+
         /// <summary>
         /// Starts a Host
         /// </summary>

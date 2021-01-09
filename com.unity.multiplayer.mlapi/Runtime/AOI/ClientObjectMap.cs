@@ -8,16 +8,17 @@ namespace MLAPI.AOI
 {
     // To establish a Client Object Map, instantiate a ClientObjMapNodeBase, then
     //  add more nodes to it (and those nodes) as desired
-   public class ClientObjMapNode<TClient, TObject>
+   public class ClientObjMapNode<TClient, TObject> where TObject : class
    {
         // set this delegate if you want a function called when
-        //  object 'obj' is being de-spawned
-        public delegate void DespawnDelegate(ref TObject obj);
-        public DespawnDelegate OnDespawn;
+        //  object 'obj' is being spawned / de-spawned
+        public delegate void SpawnDelegate(in TObject obj);
+        public SpawnDelegate OnSpawn;
+        public SpawnDelegate OnDespawn;
 
         // to dynamically compute objects to be added each 'QueryFor' call,
         //  assign this delegate to your handler
-        public delegate void QueryDelegate(ref TClient client, HashSet<TObject> results);
+        public delegate void QueryDelegate(in TClient client, HashSet<TObject> results);
         public QueryDelegate OnQuery;
 
         public delegate void BypassDelegate(HashSet<TObject> results);
@@ -30,7 +31,7 @@ namespace MLAPI.AOI
 
         // externally-called object query function.  Call this on your root
         //  ClientObjectMapNode.  The passed-in hash set will contain the results.
-        public void QueryFor(ref TClient client, HashSet<TObject> results)
+        public void QueryFor(in TClient client, HashSet<TObject> results)
         {
             if (Bypass)
             {
@@ -40,12 +41,12 @@ namespace MLAPI.AOI
             {
                 if (OnQuery != null)
                 {
-                    OnQuery(ref client, results);
+                    OnQuery(client, results);
                 }
 
                 foreach (var c in m_ChildNodes)
                 {
-                    c.QueryFor(ref client, results);
+                    c.QueryFor(client, results);
                 }
             }
         }
@@ -53,16 +54,29 @@ namespace MLAPI.AOI
         // Called when a given object is about to be despawned.  The OnDespawn
         //  delegate gives each node a chance to do its own handling (e.g. removing
         //  the object from a cache)
-        public void DespawnCleanup(ref TObject obj)
+        public void HandleSpawn(in TObject obj)
         {
-            if (OnDespawn != null)
+            if (OnSpawn != null)
             {
-                OnDespawn(ref obj);
+                OnSpawn(in obj);
             }
 
             foreach (var c in m_ChildNodes)
             {
-                c.DespawnCleanup(ref obj);
+                c.HandleSpawn(in obj);
+            }
+        }
+
+        public void HandleDespawn(in TObject obj)
+        {
+            if (OnDespawn != null)
+            {
+                OnDespawn(in obj);
+            }
+
+            foreach (var c in m_ChildNodes)
+            {
+                c.HandleDespawn(in obj);
             }
         }
 
@@ -79,7 +93,7 @@ namespace MLAPI.AOI
    // Static node type.  Objects can be added / removed as desired.
    //  When the Query is done, these objects are grafted in without
    //  any per-object computation.
-   public class ClientObjMapNodeStatic<TClient, TObject> : ClientObjMapNode<TClient, TObject>
+   public class ClientObjMapNodeStatic<TClient, TObject> : ClientObjMapNode<TClient, TObject> where TObject : class
     {
         public ClientObjMapNodeStatic()
         {
@@ -91,16 +105,16 @@ namespace MLAPI.AOI
             // for our query, we simply union our static objects with the results
             //  more sophisticated methods might be explored later, like having the results
             //  list be a list of refs that can be single elements or lists
-            OnQuery = (ref TClient client, HashSet<TObject> results) => results.UnionWith(m_AlwaysRelevant);
+            OnQuery = (in TClient client, HashSet<TObject> results) => results.UnionWith(m_AlwaysRelevant);
         }
 
         // Add a new item to our static list
-        public void Add(ref TObject obj)
+        public void Add(in TObject obj)
         {
             m_AlwaysRelevant.Add(obj);
         }
 
-        public void Remove(ref TObject obj)
+        public void Remove(in TObject obj)
         {
             m_AlwaysRelevant.Remove(obj);
         }

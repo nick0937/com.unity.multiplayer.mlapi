@@ -382,6 +382,7 @@ namespace MLAPI
 
         internal bool networkedStartInvoked = false;
         internal bool internalNetworkedStartInvoked = false;
+        static ushort currentTick = 0;
         /// <summary>
         /// Gets called when message handlers are ready to be registered and the networking is setup
         /// </summary>
@@ -542,11 +543,23 @@ namespace MLAPI
 
         internal static void NetworkedBehaviourUpdate()
         {
+            ushort tick = GetTick();
+            if (tick == currentTick)
+            {
+                return;
+            }
+            else
+            {
+                currentTick = tick;
+            }
+
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             s_NetworkedBehaviourUpdate.Begin();
 #endif
+
             try
             {
+
                 if (IsServer)
                 {
                     touched.Clear();
@@ -595,7 +608,6 @@ namespace MLAPI
                         }
                     }
                 }
-
             }
             finally
             {
@@ -636,15 +648,16 @@ namespace MLAPI
         private readonly List<int> networkedVarIndexesToReset = new List<int>();
         private readonly HashSet<int> networkedVarIndexesToResetSet = new HashSet<int>();
 
-        private ushort GetTick()
+        // temporary, to be replaced by the tick system
+        public static ushort GetTick()
         {
-            return (ushort)(Time.time / 0.20);
+            return (ushort)(Time.time / 0.016);
         }
 
         private void NetworkedVarUpdate(ulong clientId)
         {
-           if (!CouldHaveDirtyNetworkedVars())
-               return;
+            if (!CouldHaveDirtyNetworkedVars())
+                return;
 
             for (int j = 0; j < channelMappedNetworkedVarIndexes.Count; j++)
             {
@@ -657,7 +670,7 @@ namespace MLAPI
 
                         // Write the current tick frame
                         // todo: ideally this would not be done per-variable, but only once per-frame
-                        writer.WriteUInt16Packed(GetTick());
+                        writer.WriteUInt16Packed(currentTick);
 
                         bool writtenAny = false;
                         for (int k = 0; k < networkedVarFields.Count; k++)

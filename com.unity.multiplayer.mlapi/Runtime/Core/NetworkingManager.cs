@@ -40,7 +40,7 @@ namespace MLAPI
     /// The main component of the library
     /// </summary>
     [AddComponentMenu("MLAPI/NetworkingManager", -100)]
-    public class NetworkingManager : UpdateLoopBehaviour
+    public class NetworkingManager : MonoBehaviour, INetworkUpdateSystem
     {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -655,7 +655,9 @@ namespace MLAPI
             }
             else
             {
-                RegisterUpdateLoopSystem();
+                this.RegisterNetworkUpdate(NetworkUpdateStage.PreUpdate);
+                this.RegisterNetworkUpdate(NetworkUpdateStage.Update);
+
                 Singleton = this;
                 if (OnSingletonReady != null)
                     OnSingletonReady();
@@ -668,7 +670,8 @@ namespace MLAPI
 
         private void OnDestroy()
         {
-            OnNetworkLoopSystemRemove();
+            this.UnregisterAllNetworkUpdates();
+
             //NSS: This is ok to leave this check here
             rpcQueueContainer?.Shutdown();
 
@@ -705,32 +708,6 @@ namespace MLAPI
         }
 
         /// <summary>
-        /// InternalRegisterNetworkUpdateStage
-        /// Registers all pertinent update stages for NetworkingManager
-        /// </summary>
-        /// <param name="stage">update stage to get callback for</param>
-        /// <returns></returns>
-        protected override Action InternalRegisterNetworkUpdateStage(NetworkUpdateManager.NetworkUpdateStages stage)
-        {
-            Action updateStageCallback = null;
-            switch (stage)
-            {
-                case NetworkUpdateManager.NetworkUpdateStages.PreUpdate:
-                    {
-                        updateStageCallback = NetworkPreUpdate;
-                        break;
-                    }
-                case NetworkUpdateManager.NetworkUpdateStages.Update:
-                    {
-                        updateStageCallback = NetworkUpdate;
-                        break;
-                    }
-            }
-
-            return updateStageCallback;
-        }
-
-        /// <summary>
         /// Awake
         /// Currently this only creates the RpcQueueContainer instance and initializes it.
         /// </summary>
@@ -747,11 +724,24 @@ namespace MLAPI
         private float m_EventOvershootCounter;
         private float m_LastTimeSyncTime;
 
+        public void NetworkUpdate()
+        {
+            switch (NetworkUpdateLoop.UpdateStage)
+            {
+                case NetworkUpdateStage.PreUpdate:
+                    OnNetworkPreUpdate();
+                    break;
+                case NetworkUpdateStage.Update:
+                    OnNetworkUpdate();
+                    break;
+            }
+        }
+
         /// <summary>
         /// NetworkPreUpdate:
         /// Mostly for handling the receiving of RPCs
         /// </summary>
-        private void NetworkPreUpdate()
+        private void OnNetworkPreUpdate()
         {
             if (IsListening)
             {
@@ -811,7 +801,7 @@ namespace MLAPI
         /// NetworkUpdate:
         /// Primarily handles all remaining messages, network variable/behavior updates
         /// </summary>
-        private void NetworkUpdate()
+        private void OnNetworkUpdate()
         {
             if (IsListening)
             {

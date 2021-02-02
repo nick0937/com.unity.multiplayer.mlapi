@@ -1246,7 +1246,7 @@ namespace MLAPI
 #endif
             var networkObjectId = queueItem.streamReader.ReadUInt64Packed();
             var networkBehaviourId = queueItem.streamReader.ReadUInt16Packed();
-            var networkUpdateStage = queueItem.streamReader.ReadUInt16Packed();
+            var networkUpdateStage = queueItem.streamReader.ReadByteDirect();
             var networkMethodId = queueItem.streamReader.ReadUInt32Packed();
 
             if (__ntable.ContainsKey(networkMethodId))
@@ -1265,7 +1265,7 @@ namespace MLAPI
                         {
                             Receive = new ServerRpcReceiveParams
                             {
-                                UpdateStage = (NetworkUpdateManager.NetworkUpdateStage)networkUpdateStage,
+                                UpdateStage = (NetworkUpdateStage)networkUpdateStage,
                                 SenderClientId = queueItem.networkId
                             }
                         };
@@ -1275,7 +1275,7 @@ namespace MLAPI
                         {
                             Receive = new ClientRpcReceiveParams
                             {
-                                UpdateStage = (NetworkUpdateManager.NetworkUpdateStage)networkUpdateStage
+                                UpdateStage = (NetworkUpdateStage)networkUpdateStage
                             }
                         };
                         break;

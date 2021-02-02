@@ -419,13 +419,13 @@ namespace MLAPI.Spawning
 
             var QueueItem = new FrameQueueItem
             {
-                updateStage = NetworkUpdateManager.NetworkUpdateStage.Update,
+                updateStage = NetworkUpdateStage.Update,
                 queueItemType = RpcQueueContainer.QueueItemType.CreateObject,
                 networkId = 0,
                 itemStream = stream,
                 channel = Transport.MLAPI_INTERNAL_CHANNEL,
                 sendFlags = SecuritySendFlags.None,
-                clientIds = new[] {clientId}
+                clientIds = new[] { clientId }
             };
             rpcQueueContainer.AddToInternalMLAPISendQueue(QueueItem);
         }

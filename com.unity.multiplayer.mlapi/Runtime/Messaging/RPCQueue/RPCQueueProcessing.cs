@@ -36,7 +36,7 @@ namespace MLAPI.Messaging
         /// ProcessReceiveQueue
         /// Public facing interface method to start processing all RPCs in the current inbound frame
         /// </summary>
-        public void ProcessReceiveQueue(NetworkUpdateManager.NetworkUpdateStage currentStage)
+        public void ProcessReceiveQueue(NetworkUpdateStage currentStage)
         {
             bool AdvanceFrameHistory = false;
             var rpcQueueContainer = NetworkingManager.Singleton.rpcQueueContainer;
@@ -45,7 +45,7 @@ namespace MLAPI.Messaging
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                 s_MLAPIRPCQueueProcess.Begin();
 #endif
-                var CurrentFrame = rpcQueueContainer.GetCurrentFrame(QueueHistoryFrame.QueueFrameType.Inbound,currentStage);
+                var CurrentFrame = rpcQueueContainer.GetCurrentFrame(QueueHistoryFrame.QueueFrameType.Inbound, currentStage);
                 if (CurrentFrame != null)
                 {
                     var currentQueueItem = CurrentFrame.GetFirstQueueItem();
@@ -58,7 +58,7 @@ namespace MLAPI.Messaging
                         }
                         if (rpcQueueContainer.IsTesting())
                         {
-                            Debug.Log("RPC invoked during the " + currentStage.ToString() + " update stage.");
+                            Debug.Log("RPC invoked during the " + currentStage + " update stage.");
                         }
                         NetworkingManager.InvokeRpc(currentQueueItem);
                         ProfilerStatManager.rpcsQueueProc.Record();
@@ -157,7 +157,7 @@ namespace MLAPI.Messaging
             var rpcQueueContainer = NetworkingManager.Singleton.rpcQueueContainer;
             if (rpcQueueContainer != null)
             {
-                var CurrentFrame = rpcQueueContainer.GetCurrentFrame(QueueHistoryFrame.QueueFrameType.Outbound,NetworkUpdateManager.NetworkUpdateStage.LateUpdate);
+                var CurrentFrame = rpcQueueContainer.GetCurrentFrame(QueueHistoryFrame.QueueFrameType.Outbound, NetworkUpdateStage.PostLateUpdate);
                 //If loopback is enabled
                 if (rpcQueueContainer.IsLoopBack())
                 {

@@ -2,7 +2,7 @@ using System;
 using MLAPI.Security;
 using MLAPI.Serialization.Pooled;
 
-namespace  MLAPI.Messaging
+namespace MLAPI.Messaging
 {
     /// <summary>
     /// FrameQueueItem
@@ -13,12 +13,12 @@ namespace  MLAPI.Messaging
     /// </summary>
     public struct FrameQueueItem
     {
-        public NetworkUpdateManager.NetworkUpdateStage   updateStage;
+        public NetworkUpdateStage                        updateStage;
         public RpcQueueContainer.QueueItemType           queueItemType;
         public SecuritySendFlags                         sendFlags;
-        public ulong                                     networkId;          //Sender's network Identifier
+        public ulong                                     networkId;          // Sender's network Identifier
         public byte                                      channel;
-        public ulong[]                                   clientIds;          //Server invoked Client RPCs only
+        public ulong[]                                   clientIds;          // Server invoked Client RPCs only
         public long                                      streamSize;
         public float                                     timeStamp;
         public PooledBitWriter                           streamWriter;

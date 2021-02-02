@@ -85,14 +85,7 @@ namespace MLAPI
             writer.WriteUInt16Packed(GetBehaviourId()); // NetworkBehaviourId
 
             // Write the update stage in front of RPC related information
-            if (serverRpcParams.Send.UpdateStage == NetworkUpdateManager.NetworkUpdateStage.Default)
-            {
-                writer.WriteUInt16Packed((ushort)NetworkUpdateManager.NetworkUpdateStage.Update);
-            }
-            else
-            {
-                writer.WriteUInt16Packed((ushort)serverRpcParams.Send.UpdateStage);
-            }
+            writer.WriteByte((byte)serverRpcParams.Send.UpdateStage);
 
             return writer.Serializer;
         }
@@ -143,14 +136,7 @@ namespace MLAPI
             writer.WriteUInt16Packed(GetBehaviourId()); // NetworkBehaviourId
 
             // Write the update stage in front of RPC related information
-            if (clientRpcParams.Send.UpdateStage == NetworkUpdateManager.NetworkUpdateStage.Default)
-            {
-                writer.WriteUInt16Packed((ushort)NetworkUpdateManager.NetworkUpdateStage.Update);
-            }
-            else
-            {
-                writer.WriteUInt16Packed((ushort)clientRpcParams.Send.UpdateStage);
-            }
+            writer.WriteByte((byte)clientRpcParams.Send.UpdateStage);
 
             return writer.Serializer;
         }

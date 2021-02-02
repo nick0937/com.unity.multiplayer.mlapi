@@ -11,15 +11,15 @@ namespace MLAPI
         void NetworkUpdate();
     }
 
-    public enum NetworkUpdateStage
+    public enum NetworkUpdateStage : byte
     {
-        Initialization = -4,
-        EarlyUpdate = -3,
-        FixedUpdate = -2,
-        PreUpdate = -1,
+        Initialization = 1,
+        EarlyUpdate = 2,
+        FixedUpdate = 3,
+        PreUpdate = 4,
         Update = 0,
-        PreLateUpdate = 1,
-        PostLateUpdate = 2
+        PreLateUpdate = 5,
+        PostLateUpdate = 6
     }
 
     public static class NetworkUpdateLoop

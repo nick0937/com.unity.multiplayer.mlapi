@@ -85,7 +85,6 @@ namespace MLAPI.Transports
 
         /// <summary>
         /// The channels the MLAPI will use when sending internal messages.
-        /// The string for each channel is only used by the profiler
         /// </summary>
         private TransportChannel[] MLAPI_INTERNAL_CHANNELS = new TransportChannel[]
         {

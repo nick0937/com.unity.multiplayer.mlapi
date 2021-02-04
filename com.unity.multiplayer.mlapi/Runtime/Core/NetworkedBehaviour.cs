@@ -70,7 +70,7 @@ namespace MLAPI
             var writer = rpcQueueContainer.BeginAddQueueItemToOutboundFrame(
                 RpcQueueContainer.QueueItemType.ServerRpc,
                 Time.realtimeSinceStartup,
-                Transport.MLAPI_STDRPC_CHANNEL,
+                Channel.StdRpc,
                 /* sendFlags = */ 0,
                 NetworkingManager.Singleton.ServerClientId,
                 /* targetNetworkIds = */ null);
@@ -128,7 +128,7 @@ namespace MLAPI
             var writer = rpcQueueContainer.BeginAddQueueItemToOutboundFrame(
                 RpcQueueContainer.QueueItemType.ClientRpc,
                 Time.realtimeSinceStartup,
-                Transport.MLAPI_STDRPC_CHANNEL,
+                Channel.StdRpc,
                 /* sendFlags = */ 0,
                 NetworkId,
                 clientRpcParams.Send.TargetClientIds ?? NetworkingManager.Singleton.ConnectedClientsList.Select(c => c.ClientId).ToArray());
@@ -353,7 +353,7 @@ namespace MLAPI
         private bool varInit = false;
 
         private readonly List<HashSet<int>> channelMappedNetworkedVarIndexes = new List<HashSet<int>>();
-        private readonly List<byte> channelsForNetworkedVarGroups = new List<byte>();
+        private readonly List<Channel> channelsForNetworkedVarGroups = new List<Channel>();
         internal readonly List<INetworkedVar> networkedVarFields = new List<INetworkedVar>();
 
         private static HashSet<MLAPI.NetworkedObject> touched = new HashSet<MLAPI.NetworkedObject>();
@@ -418,12 +418,12 @@ namespace MLAPI
 
             {
                 // Create index map for channels
-                Dictionary<byte, int> firstLevelIndex = new Dictionary<byte, int>();
+                Dictionary<Channel, int> firstLevelIndex = new Dictionary<Channel, int>();
                 int secondLevelCounter = 0;
 
                 for (int i = 0; i < networkedVarFields.Count; i++)
                 {
-                    byte channel = networkedVarFields[i].GetChannel();
+                    Channel channel = networkedVarFields[i].GetChannel();
 
                     if (!firstLevelIndex.ContainsKey(channel))
                     {

@@ -661,7 +661,7 @@ namespace MLAPI
         // temporary, to be replaced by the tick system
         public static ushort GetTick()
         {
-            return (ushort)(Time.time / 0.016);
+            return (ushort)(Time.time /0.1);
         }
 
         private void NetworkedVarUpdate(ulong clientId)
@@ -719,6 +719,8 @@ namespace MLAPI
 
                             if (shouldWrite)
                             {
+                                writer.WriteUInt16Packed(networkedVarFields[k].SrcTick);
+
                                 writtenAny = true;
 
                                 if (NetworkingManager.Singleton.NetworkConfig.EnsureNetworkedVarLengthSafety)
@@ -771,7 +773,7 @@ namespace MLAPI
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
-                ushort srcTick = reader.ReadUInt16Packed();
+                ushort sndTick = reader.ReadUInt16Packed();
 
                 for (int i = 0; i < networkedVarList.Count; i++)
                 {
@@ -823,6 +825,7 @@ namespace MLAPI
                         }
                     }
 
+                    ushort srcTick = reader.ReadUInt16Packed();
                     long readStartPos = stream.Position;
 
                     networkedVarList[i].ReadDelta(stream, IsServer, srcTick);
@@ -851,7 +854,7 @@ namespace MLAPI
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
-                ushort srcTick = reader.ReadUInt16Packed();
+                ushort sndTick = reader.ReadUInt16Packed();
 
                 for (int i = 0; i < networkedVarList.Count; i++)
                 {
@@ -892,6 +895,7 @@ namespace MLAPI
                         }
                     }
 
+                    ushort srcTick = reader.ReadUInt16Packed();
                     long readStartPos = stream.Position;
 
                     networkedVarList[i].ReadField(stream, srcTick);

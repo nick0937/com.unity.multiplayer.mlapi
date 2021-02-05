@@ -253,6 +253,7 @@ namespace MLAPI.Transports.UNET
 
         public override SocketTasks StartServer()
         {
+            UnityEngine.Debug.Log("STARTING SERVER!");
             HostTopology topology = new HostTopology(GetConfig(), MaxConnections);
 
             if (SupportWebsocket)
@@ -343,6 +344,7 @@ namespace MLAPI.Transports.UNET
 
         public ConnectionConfig GetConfig()
         {
+            UnityEngine.Debug.Log("asdfasdf");
             ConnectionConfig config = new ConnectionConfig();
 
             for (int i = 0; i < MLAPI_CHANNELS.Length; i++)

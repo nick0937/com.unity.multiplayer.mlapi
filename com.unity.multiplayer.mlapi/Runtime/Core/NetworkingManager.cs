@@ -390,9 +390,13 @@ namespace MLAPI
 
             try
             {
-                string pfx = NetworkConfig.ServerBase64PfxCertificate.Trim();
+                string pfx = null;
+                if (NetworkConfig.ServerBase64PfxCertificate != null)
+                {
+                    pfx = NetworkConfig.ServerBase64PfxCertificate.Trim();
+                }
 
-                if (server && NetworkConfig.EnableEncryption && NetworkConfig.SignKeyExchange && !string.IsNullOrEmpty(pfx))
+                if (server && pfx != null && NetworkConfig.EnableEncryption && NetworkConfig.SignKeyExchange && !string.IsNullOrEmpty(pfx))
                 {
                     try
                     {
@@ -481,7 +485,8 @@ namespace MLAPI
             IsClient = false;
             IsListening = true;
 
-            SpawnManager.ServerSpawnSceneObjectsOnStartSweep();
+           /////????
+           SpawnManager.ServerSpawnSceneObjectsOnStartSweep();
 
             if (OnServerStarted != null)
                 OnServerStarted.Invoke();
@@ -632,6 +637,14 @@ namespace MLAPI
             return tasks;
         }
 
+        public void SetSingleton()
+        {
+            Singleton = this;
+
+            if (OnSingletonReady != null)
+                OnSingletonReady();
+        }
+
         private void OnEnable()
         {
             if (Singleton != null && Singleton != this)
@@ -641,9 +654,7 @@ namespace MLAPI
             else
             {
                 RegisterUpdateLoopSystem();
-                Singleton = this;
-                if (OnSingletonReady != null)
-                    OnSingletonReady();
+                SetSingleton();
                 if (DontDestroy)
                     DontDestroyOnLoad(gameObject);
                 if (RunInBackground)
@@ -664,7 +675,7 @@ namespace MLAPI
             }
         }
 
-        private void Shutdown()
+        public void Shutdown()
         {
             if (NetworkLog.CurrentLogLevel <= LogLevel.Developer) NetworkLog.LogInfo("Shutdown()");
             NetworkProfiler.Stop();

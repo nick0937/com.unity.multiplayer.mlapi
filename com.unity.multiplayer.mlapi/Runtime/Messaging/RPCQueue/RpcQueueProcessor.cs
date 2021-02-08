@@ -15,11 +15,6 @@ namespace MLAPI.Messaging
     /// </summary>
     internal class RpcQueueProcessor
     {
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-        static ProfilerMarker s_MLAPIRPCQueueProcess = new ProfilerMarker("MLAPIRPCQueueProcess");
-        static ProfilerMarker s_MLAPIRPCQueueSend = new ProfilerMarker("MLAPIRPCQueueSend");
-#endif
-
         // Batcher object used to manage the RPC batching on the send side
         private readonly RpcBatcher m_RpcBatcher = new RpcBatcher();
         private const int k_BatchThreshold = 512;
@@ -38,9 +33,6 @@ namespace MLAPI.Messaging
             var rpcQueueContainer = NetworkingManager.Singleton.rpcQueueContainer;
             if (rpcQueueContainer != null)
             {
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-                s_MLAPIRPCQueueProcess.Begin();
-#endif
                 var CurrentFrame = rpcQueueContainer.GetQueueHistoryFrame(QueueHistoryFrame.QueueFrameType.Inbound,currentStage);
                 var NextFrame = rpcQueueContainer.GetQueueHistoryFrame(QueueHistoryFrame.QueueFrameType.Inbound,currentStage,true);
                 if (NextFrame.isDirty && NextFrame.hasLoopbackData)
@@ -74,9 +66,6 @@ namespace MLAPI.Messaging
                     rpcQueueContainer.AdvanceFrameHistory(QueueHistoryFrame.QueueFrameType.Inbound);
                 }
             }
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-            s_MLAPIRPCQueueProcess.End();
-#endif
         }
 
         /// <summary>
@@ -85,15 +74,8 @@ namespace MLAPI.Messaging
         /// </summary>
         public void ProcessSendQueue()
         {
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-            s_MLAPIRPCQueueSend.Begin();
-#endif
-
             RPCQueueSendAndFlush();
 
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-            s_MLAPIRPCQueueSend.End();
-#endif
             InternalMessagesSendAndFlush();
         }
 

@@ -90,7 +90,7 @@ namespace MLAPI.NetworkedVar.Collections
         }
 
         /// <inheritdoc />
-        public void ReadDelta(Stream stream, bool keepDirtyDelta, ushort srcTick)
+        public void ReadDelta(Stream stream, bool keepDirtyDelta, ushort localTick, ushort remoteTick)
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
@@ -238,7 +238,7 @@ namespace MLAPI.NetworkedVar.Collections
         }
 
         /// <inheritdoc />
-        public void ReadField(Stream stream, ushort srcTick)
+        public void ReadField(Stream stream, ushort localTick, ushort remoteTick)
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
@@ -541,7 +541,7 @@ namespace MLAPI.NetworkedVar.Collections
                 dirtyEvents.Add(dictionaryEvent);
             }
         }
-        public ushort SrcTick { get; }
+        public ushort RemoteTick { get; }
     }
 
     /// <summary>

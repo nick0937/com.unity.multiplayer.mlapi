@@ -719,7 +719,8 @@ namespace MLAPI
 
                             if (shouldWrite)
                             {
-                                writer.WriteUInt16Packed(networkedVarFields[k].SrcTick);
+                                writer.WriteUInt16Packed(networkedVarFields[k].RemoteTick);
+                                FileLogger.Get().Log("Writing " + currentTick + " " + networkedVarFields[k].RemoteTick);
 
                                 writtenAny = true;
 
@@ -773,7 +774,7 @@ namespace MLAPI
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
-                ushort sndTick = reader.ReadUInt16Packed();
+                ushort remoteTick = reader.ReadUInt16Packed();
 
                 for (int i = 0; i < networkedVarList.Count; i++)
                 {
@@ -825,10 +826,13 @@ namespace MLAPI
                         }
                     }
 
-                    ushort srcTick = reader.ReadUInt16Packed();
+                    ushort localTick = reader.ReadUInt16Packed();
+
+                    FileLogger.Get().Log("Reading " + remoteTick + " " + localTick);
+
                     long readStartPos = stream.Position;
 
-                    networkedVarList[i].ReadDelta(stream, IsServer, sndTick);
+                    networkedVarList[i].ReadDelta(stream, IsServer, localTick, remoteTick);
                     ProfilerStatManager.networkVarsRcvd.Record();
 
                     if (NetworkingManager.Singleton.NetworkConfig.EnsureNetworkedVarLengthSafety)
@@ -854,7 +858,7 @@ namespace MLAPI
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
-                ushort sndTick = reader.ReadUInt16Packed();
+                ushort remoteTick = reader.ReadUInt16Packed();
 
                 for (int i = 0; i < networkedVarList.Count; i++)
                 {
@@ -895,10 +899,10 @@ namespace MLAPI
                         }
                     }
 
-                    ushort srcTick = reader.ReadUInt16Packed();
+                    ushort localTick = reader.ReadUInt16Packed();
                     long readStartPos = stream.Position;
 
-                    networkedVarList[i].ReadField(stream, srcTick);
+                    networkedVarList[i].ReadField(stream, localTick, remoteTick);
                     ProfilerStatManager.networkVarsRcvd.Record();
 
                     if (NetworkingManager.Singleton.NetworkConfig.EnsureNetworkedVarLengthSafety)
@@ -969,7 +973,7 @@ namespace MLAPI
             }
         }
 
-        internal static void SetNetworkedVarData(List<INetworkedVar> networkedVarList, Stream stream, ushort srcTick)
+        internal static void SetNetworkedVarData(List<INetworkedVar> networkedVarList, Stream stream, ushort localTick, ushort remoteTick)
         {
             if (networkedVarList.Count == 0)
                 return;
@@ -995,7 +999,7 @@ namespace MLAPI
 
                     long readStartPos = stream.Position;
 
-                    networkedVarList[j].ReadField(stream, srcTick);
+                    networkedVarList[j].ReadField(stream, localTick, remoteTick);
 
                     if (NetworkingManager.Singleton.NetworkConfig.EnsureNetworkedVarLengthSafety)
                     {

@@ -396,6 +396,10 @@ namespace MLAPI
 
         internal bool networkedStartInvoked = false;
         internal bool internalNetworkedStartInvoked = false;
+        /// <summary>
+        /// Stores the network tick at the NetworkedBehaviourUpdate time
+        /// This allows sending NetworkedVars not more often than once per network tick, regardless of the update rate
+        /// </summary>
         static ushort currentTick = 0;
         /// <summary>
         /// Gets called when message handlers are ready to be registered and the networking is setup
@@ -553,23 +557,19 @@ namespace MLAPI
 
         internal static void NetworkedBehaviourUpdate()
         {
+            // Don't NetworkedBehaviourUpdate more than once per network tick
             ushort tick = GetTick();
             if (tick == currentTick)
             {
                 return;
             }
-            else
-            {
-                currentTick = tick;
-            }
+            currentTick = tick;
 
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             s_NetworkedBehaviourUpdate.Begin();
 #endif
-
             try
             {
-
                 if (IsServer)
                 {
                     touched.Clear();
@@ -649,8 +649,6 @@ namespace MLAPI
             if (!varInit)
                 InitializeVars();
 
-            // this call must be deferred if the server is going to not send this frame
-            // or maybe not, this seems to just reset fields.
             PreNetworkVariableWrite();
             NetworkedVarUpdate(clientId);
         }
@@ -658,10 +656,10 @@ namespace MLAPI
         private readonly List<int> networkedVarIndexesToReset = new List<int>();
         private readonly HashSet<int> networkedVarIndexesToResetSet = new HashSet<int>();
 
-        // temporary, to be replaced by the tick system
+        // todo: This is temporary, to be replaced by the tick system
         public static ushort GetTick()
         {
-            return (ushort)(Time.time /0.1);
+            return (ushort)(Time.time / 0.1);
         }
 
         private void NetworkedVarUpdate(ulong clientId)
@@ -679,7 +677,7 @@ namespace MLAPI
                         writer.WriteUInt16Packed(NetworkedObject.GetOrderIndex(this));
 
                         // Write the current tick frame
-                        // todo: ideally this would not be done per-variable, but only once per-frame
+                        // todo: this is currently done per channel, per tick the snapshot system might improve on this
                         writer.WriteUInt16Packed(currentTick);
 
                         bool writtenAny = false;
@@ -719,10 +717,10 @@ namespace MLAPI
 
                             if (shouldWrite)
                             {
-                                writer.WriteUInt16Packed(networkedVarFields[k].RemoteTick);
-                                FileLogger.Get().Log("Writing " + currentTick + " " + networkedVarFields[k].RemoteTick);
-
                                 writtenAny = true;
+                                // write the network tick at which this NetworkedVar was modified remotely
+                                // will allow lag-compensation
+                                writer.WriteUInt16Packed(networkedVarFields[k].RemoteTick);
 
                                 if (NetworkingManager.Singleton.NetworkConfig.EnsureNetworkedVarLengthSafety)
                                 {
@@ -774,6 +772,7 @@ namespace MLAPI
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
+                // read the remote network tick at which this variable was written.
                 ushort remoteTick = reader.ReadUInt16Packed();
 
                 for (int i = 0; i < networkedVarList.Count; i++)
@@ -826,9 +825,9 @@ namespace MLAPI
                         }
                     }
 
+                    // read the local network tick at which this variable was written.
+                    // if this var was updated from our machine, this local tick will be locally valid
                     ushort localTick = reader.ReadUInt16Packed();
-
-                    FileLogger.Get().Log("Reading " + remoteTick + " " + localTick);
 
                     long readStartPos = stream.Position;
 
@@ -858,6 +857,7 @@ namespace MLAPI
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
+                // read the remote network tick at which this variable was written.
                 ushort remoteTick = reader.ReadUInt16Packed();
 
                 for (int i = 0; i < networkedVarList.Count; i++)
@@ -899,6 +899,8 @@ namespace MLAPI
                         }
                     }
 
+                    // read the local network tick at which this variable was written.
+                    // if this var was updated from our machine, this local tick will be locally valid
                     ushort localTick = reader.ReadUInt16Packed();
                     long readStartPos = stream.Position;
 

@@ -972,7 +972,7 @@ namespace MLAPI
             }
         }
 
-        internal static void SetNetworkedVarData(List<INetworkedVar> networkedVarList, Stream stream, ushort localTick, ushort remoteTick)
+        internal static void SetNetworkedVarData(List<INetworkedVar> networkedVarList, Stream stream)
         {
             if (networkedVarList.Count == 0)
                 return;
@@ -998,7 +998,7 @@ namespace MLAPI
 
                     long readStartPos = stream.Position;
 
-                    networkedVarList[j].ReadField(stream, localTick, remoteTick);
+                    networkedVarList[j].ReadField(stream, 0, 0);
 
                     if (NetworkingManager.Singleton.NetworkConfig.EnsureNetworkedVarLengthSafety)
                     {

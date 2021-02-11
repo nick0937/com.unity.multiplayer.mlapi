@@ -1,148 +1,36 @@
 using System;
 using UnityEngine;
-using MLAPI;
+
 
 namespace MLAPI
 {
-    public class NetworkTickSystem : NetworkUpdateLoopBehaviour
+    public class NetworkTickSystem : GenericUpdateLoopSystem, IDisposable
     {
+        private const int m_DefaultTickFrequency = 20;
 
-        [Range(1,120)]
-        public  int tickFrequency = 60;         //60 fps network tick default (range from 1 to 120)
+        private bool m_IsTicking;               //Used to determine if the tick system is ticking
+
+        private int tickFrequency;              //current network tick frequency in network frames per second
         private int m_CurrentTickFrequency;     //Used to determine if tick frequency changed
 
         private double m_NetworkFrameTick;      //How many network ticks have passed?
         private double m_TimePerTick;           //Calculated from TickFrequency
         private double m_NetworkTime;           //The current network time based on NetworkFrameTick and TickPeriod
         private double m_LastTickUpdate;        //When the last tick update happened
-        private double m_AverageTickDelta;      //Average Time between tick updates
-
-
-        //For testing purposes
-        private bool m_IsServerForced;
-        private bool m_IsTicking;
-
-        public void StartTicking(bool isTicking, bool bForceServer = false)
-        {
-            if(isTicking)
-            {
-                m_IsServerForced = bForceServer;
-                CalculateTickTime();
-                m_NetworkFrameTick = 0;                                         //Start at frame 0
-                m_NetworkTime = 0;                                              //Set the initial time elapsed to zero
-                m_LastTickUpdate = Time.unscaledTime;
-                if(bForceServer)
-                {
-                    RegisterUpdateLoopSystem();
-                }
-            }
-            else
-            {
-                OnNetworkLoopSystemRemove();
-            }
-            m_IsTicking = isTicking;
-        }
-
-        private bool IsServerEnabled()
-        {
-            return (IsServer || m_IsServerForced);
-        }
 
         /// <summary>
-        /// NetworkStart
-        /// Called when the network is started
-        /// Server Side: Initializes the network tick
+        /// IsTicking
+        /// Returns whether the tick system is updating network ticks
         /// </summary>
-        public override void NetworkStart()
-        {
-            if (IsServerEnabled())
-            {
-                StartTicking(true);
-            }
-
-            base.NetworkStart();
-        }
-
-        /// <summary>
-        /// InternalRegisterNetworkUpdateStage
-        /// Registers for the PreUpdate stage (psuedo code, this might end up being placed ahead of all PreUpdate registrations)
-        /// </summary>
-        /// <param name="stage">stage to register for an update</param>
         /// <returns></returns>
-        protected override Action InternalRegisterNetworkUpdateStage(NetworkUpdateManager.NetworkUpdateStage stage)
+        public bool IsTicking()
         {
-            if (IsServerEnabled() && stage == NetworkUpdateManager.NetworkUpdateStage.PreUpdate)
-            {
-                return new Action(UpdateNetworkTick);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Calculates the tick time if there is a delta between the CurrentTickFrequency and TickFrequency
-        /// </summary>
-        private void CalculateTickTime()
-        {
-            if (m_CurrentTickFrequency != tickFrequency)
-            {
-                m_CurrentTickFrequency = tickFrequency;
-                //This calculation rounds down to the nearest millisecond, anything beyond that is outside of typical network communication latencies
-                m_TimePerTick =(float)Math.Truncate(1000 * (1.0f / (float)m_CurrentTickFrequency)) * 0.001f;
-            }
-        }
-
-        /// <summary>
-        /// UpdateNetworkTick
-        /// Called each network loop update during the PreUpdate stage
-        /// </summary>
-        private void UpdateNetworkTick()
-        {
-            if (IsServerEnabled() && m_IsTicking)
-            {
-                //Always check to see if there was a change?
-                CalculateTickTime();
-                double unscaledTime = Time.unscaledTimeAsDouble;
-                double deltaTime = unscaledTime - m_LastTickUpdate;
-
-                if (m_TimePerTick <= deltaTime)
-                {
-                    m_LastTickUpdate = unscaledTime;
-                    m_NetworkFrameTick++;
-                    m_NetworkTime = m_TimePerTick * m_NetworkFrameTick;
-                    m_AverageTickDelta += deltaTime;
-                    m_AverageTickDelta *= 0.5;
-                }
-            }
-        }
-
-        /// <summary>
-        /// NetworkTickUpdate
-        /// Invoked on the client side when receiving a network tick
-        /// Calculates the network time relative to the tick.
-        /// </summary>
-        /// <param name="networkTick"></param>
-        /// <returns>true = tick was updated | false = tick was not updated</returns>
-        public bool NetworkTickUpdate(int networkTick, double )
-        {
-            if(!IsServer)
-            {
-                if(networkTick > m_NetworkFrameTick)
-                {
-                    m_NetworkFrameTick = (double)networkTick;
-                    double PreviousNetworkTime = m_NetworkTime;
-                    m_NetworkTime = m_TimePerTick * m_NetworkFrameTick;
-                    double deltaTime = m_NetworkTime - PreviousNetworkTime;
-                    m_AverageTickDelta += deltaTime;
-                    m_AverageTickDelta *= 0.5;
-                    return true;
-                }
-            }
-            return false;
+            return m_IsTicking;
         }
 
         /// <summary>
         /// GetTickInterval
+        /// Returns the tick interval period in seconds
         /// </summary>
         /// <returns></returns>
         public double GetTickInterval()
@@ -155,31 +43,133 @@ namespace MLAPI
         /// Gets the non-fractional current network tick
         /// </summary>
         /// <returns></returns>
-        public int GetCurrentTick()
+        public int GetTick()
         {
             return (int)m_NetworkFrameTick;
         }
 
         /// <summary>
-        /// GetTickDeltaTimeAverage
-        /// Returns the averaged delta time between network ticks
-        /// </summary>
-        /// <returns>Averaged tick time delta</returns>
-        public double GetAverageTickDelta()
-        {
-            return m_AverageTickDelta;
-        }
-
-        /// <summary>
         /// GetNetworkTimeDelta
-        /// NetworkTime is calculated from the number of network ticks times m_TimePerTick.
-        /// Server: Does this calculation when it updates the tick value
-        /// Client: Does this calculation when it receives a new tick value
+        /// NetworkTime is a calculation based on delta time since the last network tick
         /// </summary>
         /// <returns>Network Tick Time</returns>
         public double GetNetworkTime()
         {
             return  m_NetworkTime;
+        }
+
+        /// <summary>
+        /// Start
+        /// Stats the network tick system
+        /// </summary>
+        /// <param name="resetsystem"></param>
+        public void Start(bool resetsystem = false)
+        {
+            if(!m_IsTicking)
+            {
+                InitializeTickSystem(resetsystem);
+            }
+        }
+
+        /// <summary>
+        /// Stop
+        /// Stops the network tick system
+        /// </summary>
+        public void Stop()
+        {
+            m_IsTicking = false;
+            OnNetworkLoopSystemRemove();
+        }
+
+        /// <summary>
+        /// Dispose
+        /// Called when this class is destroyed
+        /// </summary>
+        public void Dispose()
+        {
+            if(m_IsTicking)
+            {
+                Stop();
+            }
+        }
+
+        /// <summary>
+        /// CalculateTickTime
+        /// Calculates the tick time if there is a delta between the CurrentTickFrequency and TickFrequency
+        /// </summary>
+        private void CalculateTickTime()
+        {
+            m_CurrentTickFrequency = tickFrequency;
+
+            //This calculation rounds down to the nearest millisecond, anything beyond that is outside of typical network communication latencies
+            m_TimePerTick = Math.Truncate(1000 * (1.0 / (double)m_CurrentTickFrequency)) * 0.001;
+        }
+
+        /// <summary>
+        /// InitializeTickSystem
+        /// Initializes the Network Tick System
+        /// </summary>
+        /// <param name="resetsystem"></param>
+        private void InitializeTickSystem(bool resetsystem = true)
+        {
+            if (resetsystem)
+            {
+                m_NetworkFrameTick = 0;
+                m_NetworkTime = 0;
+                m_LastTickUpdate = Time.unscaledTimeAsDouble;
+            }
+
+            RegisterUpdateLoopSystem();
+
+            m_IsTicking = true;
+        }
+
+        /// <summary>
+        /// InternalRegisterNetworkUpdateStage
+        /// Registers for the PreUpdate stage (psuedo code, this will be replaced with new network update loop registration)
+        /// </summary>
+        /// <param name="stage">stage to register for an update</param>
+        /// <returns></returns>
+        protected override Action InternalRegisterNetworkUpdateStage(NetworkUpdateManager.NetworkUpdateStage stage)
+        {
+            if (stage == NetworkUpdateManager.NetworkUpdateStage.PreUpdate)
+            {
+                return new Action(UpdateNetworkTick);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// UpdateNetworkTick
+        /// Called each network loop update during the PreUpdate stage
+        /// </summary>
+        private void UpdateNetworkTick()
+        {
+            if (m_IsTicking)
+            {
+                double unscaledTime = Time.unscaledTimeAsDouble;
+                double deltaTime = unscaledTime - m_LastTickUpdate;
+
+                if (m_TimePerTick <= deltaTime)
+                {
+                    double tickDelta = deltaTime/m_TimePerTick;
+                    m_NetworkFrameTick += (int)tickDelta;
+                    m_NetworkTime = m_TimePerTick * (double)m_NetworkFrameTick;
+                    m_LastTickUpdate = unscaledTime;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// Defaults to 30 NFPS (network frames per second) if no tick frequency is specified
+        /// </summary>
+        /// <param name="tickFreq"></param>
+        public NetworkTickSystem(int tickFreq = m_DefaultTickFrequency)
+        {
+            //Assure we don't specify a value less than or equal to zero for tick frequency
+            tickFrequency = tickFreq <= 0 ? m_DefaultTickFrequency:tickFreq;
+            CalculateTickTime();
         }
     }
 }

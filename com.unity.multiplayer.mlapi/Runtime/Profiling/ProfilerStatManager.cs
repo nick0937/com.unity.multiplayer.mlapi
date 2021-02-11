@@ -20,7 +20,6 @@ namespace MLAPI.Profiling
         public static ProfilerStat rpcsQueueProc = new ProfilerStat("RPCS-Processed");
         public static ProfilerStat rpcInQueueSize = new ProfilerStat("InQFrameSize");
         public static ProfilerStat rpcOutQueueSize = new ProfilerStat("OutQFrameSize");
-        public static ProfilerIncStat NetTranforms = new ProfilerIncStat("NetTransforms");
 
 
         public static void Add(ProfilerStat s)

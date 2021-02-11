@@ -28,7 +28,6 @@ namespace MLAPI
 
         private static Dictionary<INetworkUpdateLoopSystem, Dictionary<NetworkUpdateStage, PlayerLoopSystem>> s_RegisteredUpdateLoopSystems = new Dictionary<INetworkUpdateLoopSystem, Dictionary<NetworkUpdateStage, PlayerLoopSystem>>();
 
-
         /// <summary>
         /// RegisterSystem
         /// Registers all of the defined update stages

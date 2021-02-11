@@ -1248,11 +1248,23 @@ namespace MLAPI
 
             if (__ntable.ContainsKey(networkMethodId))
             {
-                if (!SpawnManager.SpawnedObjects.ContainsKey(networkObjectId)) return;
+                if (!SpawnManager.SpawnedObjects.ContainsKey(networkObjectId))
+                {
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+                    s_InvokeRPC.End();
+#endif
+                    return;
+                }
                 var networkObject = SpawnManager.SpawnedObjects[networkObjectId];
 
                 var networkBehaviour = networkObject.GetBehaviourAtOrderIndex(networkBehaviourId);
-                if (ReferenceEquals(networkBehaviour, null)) return;
+                if (ReferenceEquals(networkBehaviour, null))
+                {
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+                    s_InvokeRPC.End();
+#endif
+                    return;
+                }
 
                 var rpcParams = new __RpcParams();
                 switch (queueItem.queueItemType)

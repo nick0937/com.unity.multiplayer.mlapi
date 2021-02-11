@@ -6,7 +6,7 @@ namespace MLAPI
 {
     public class NetworkTickSystem : GenericUpdateLoopSystem, IDisposable
     {
-        private const int m_DefaultTickFrequency = 20;
+        private const int k_DefaultTickFrequency = 20;
 
         private bool m_IsTicking;               //Used to determine if the tick system is ticking
 
@@ -165,10 +165,10 @@ namespace MLAPI
         /// Defaults to 30 NFPS (network frames per second) if no tick frequency is specified
         /// </summary>
         /// <param name="tickFreq"></param>
-        public NetworkTickSystem(int tickFreq = m_DefaultTickFrequency)
+        public NetworkTickSystem(int tickFreq = k_DefaultTickFrequency)
         {
             //Assure we don't specify a value less than or equal to zero for tick frequency
-            tickFrequency = tickFreq <= 0 ? m_DefaultTickFrequency:tickFreq;
+            tickFrequency = tickFreq <= 0 ? k_DefaultTickFrequency:tickFreq;
             CalculateTickTime();
         }
     }

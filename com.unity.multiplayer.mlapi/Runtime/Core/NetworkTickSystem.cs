@@ -13,9 +13,10 @@ namespace MLAPI
         private int tickFrequency;              //current network tick frequency in network frames per second
         private int m_CurrentTickFrequency;     //Used to determine if tick frequency changed
 
-        private double m_NetworkFrameTick;      //How many network ticks have passed?
+        private int    m_NetworkFrameTick;      //How many network ticks have passed?
         private double m_TimePerTick;           //Calculated from TickFrequency
-        private double m_NetworkTime;           //The current network time based on m_NetworkFrameTick and m_TimePerTick
+        private double m_NetworkTime;           //Calculated from m_NetworkFrameTick and m_TimePerTick (tick frequency)
+        private double m_TimeSinceFirstTick;    //This is an additive calculation derived from the delta time since last network tick (how much real time has passed since Tick = 0)
         private double m_LastTickUpdate;        //When the last tick update happened
 
         /// <summary>
@@ -45,17 +46,27 @@ namespace MLAPI
         /// <returns></returns>
         public int GetTick()
         {
-            return (int)m_NetworkFrameTick;
+            return  m_NetworkFrameTick;
         }
 
         /// <summary>
         /// GetNetworkTime
-        /// NetworkTime is a calculation based on delta time since the last network tick
+        /// Network time is calculated from m_NetworkFrameTick and m_TimePerTick (tick frequency)
         /// </summary>
-        /// <returns>Network Tick Time</returns>
+        /// <returns>Network Time</returns>
         public double GetNetworkTime()
         {
             return  m_NetworkTime;
+        }
+
+        /// <summary>
+        /// GetTimeSinceFirstTick
+        /// This is how much real time has passed since the first network tick ( i.e. Tick = 0)
+        /// </summary>
+        /// <returns>Time since first tick</returns>
+        public double GetTimeSinceFirstTick()
+        {
+            return m_TimeSinceFirstTick;
         }
 
         /// <summary>
@@ -116,6 +127,7 @@ namespace MLAPI
             {
                 m_NetworkFrameTick = 0;
                 m_NetworkTime = 0;
+                m_TimeSinceFirstTick = 0;
                 m_LastTickUpdate = Time.unscaledTimeAsDouble;
             }
 
@@ -155,6 +167,7 @@ namespace MLAPI
                     double tickDelta = deltaTime/m_TimePerTick;
                     m_NetworkFrameTick += (int)tickDelta;
                     m_NetworkTime = m_TimePerTick * (double)m_NetworkFrameTick;
+                    m_TimeSinceFirstTick += deltaTime;
                     m_LastTickUpdate = unscaledTime;
                 }
             }

@@ -15,7 +15,7 @@ namespace MLAPI
 
         private double m_NetworkFrameTick;      //How many network ticks have passed?
         private double m_TimePerTick;           //Calculated from TickFrequency
-        private double m_NetworkTime;           //The current network time based on NetworkFrameTick and TickPeriod
+        private double m_NetworkTime;           //The current network time based on m_NetworkFrameTick and m_TimePerTick
         private double m_LastTickUpdate;        //When the last tick update happened
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace MLAPI
         }
 
         /// <summary>
-        /// GetCurrentTick
+        /// GetTick
         /// Gets the non-fractional current network tick
         /// </summary>
         /// <returns></returns>
@@ -49,7 +49,7 @@ namespace MLAPI
         }
 
         /// <summary>
-        /// GetNetworkTimeDelta
+        /// GetNetworkTime
         /// NetworkTime is a calculation based on delta time since the last network tick
         /// </summary>
         /// <returns>Network Tick Time</returns>
@@ -162,7 +162,7 @@ namespace MLAPI
 
         /// <summary>
         /// Constructor
-        /// Defaults to 30 NFPS (network frames per second) if no tick frequency is specified
+        /// Defaults to k_DefaultTickFrequency NFPS (network frames per second) if no tick frequency is specified
         /// </summary>
         /// <param name="tickFreq"></param>
         public NetworkTickSystem(int tickFreq = k_DefaultTickFrequency)

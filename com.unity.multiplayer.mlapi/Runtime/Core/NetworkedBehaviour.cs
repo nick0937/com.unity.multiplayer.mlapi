@@ -677,7 +677,7 @@ namespace MLAPI
                         writer.WriteUInt16Packed(NetworkedObject.GetOrderIndex(this));
 
                         // Write the current tick frame
-                        // todo: this is currently done per channel, per tick the snapshot system might improve on this
+                        // todo: this is currently done per channel, per tick. The snapshot system might improve on this
                         writer.WriteUInt16Packed(currentTick);
 
                         bool writtenAny = false;
@@ -854,9 +854,6 @@ namespace MLAPI
         {
             using (PooledBitReader reader = PooledBitReader.Get(stream))
             {
-                // read the remote network tick at which this variable was written.
-                ushort remoteTick = reader.ReadUInt16Packed();
-
                 for (int i = 0; i < networkedVarList.Count; i++)
                 {
                     ushort varSize = 0;
@@ -896,12 +893,9 @@ namespace MLAPI
                         }
                     }
 
-                    // read the local network tick at which this variable was written.
-                    // if this var was updated from our machine, this local tick will be locally valid
-                    ushort localTick = reader.ReadUInt16Packed();
                     long readStartPos = stream.Position;
 
-                    networkedVarList[i].ReadField(stream, localTick, remoteTick);
+                    networkedVarList[i].ReadField(stream, 0, 0);
                     ProfilerStatManager.networkVarsRcvd.Record();
 
                     if (NetworkingManager.Singleton.NetworkConfig.EnsureNetworkedVarLengthSafety)

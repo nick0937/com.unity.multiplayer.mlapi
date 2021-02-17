@@ -261,70 +261,70 @@ namespace MLAPI
             {
                 case NetworkUpdateStage.Initialization:
                 {
-                    if (!m_Initialization_List.Contains(updateSystem))
+                    if (!m_Initialization_Set.Contains(updateSystem))
                     {
-                        m_Initialization_List.Add(updateSystem);
-                        m_Initialization_Array = m_Initialization_List.ToArray();
+                        m_Initialization_Set.Add(updateSystem);
+                        m_Initialization_Array = m_Initialization_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.EarlyUpdate:
                 {
-                    if (!m_EarlyUpdate_List.Contains(updateSystem))
+                    if (!m_EarlyUpdate_Set.Contains(updateSystem))
                     {
-                        m_EarlyUpdate_List.Add(updateSystem);
-                        m_EarlyUpdate_Array = m_EarlyUpdate_List.ToArray();
+                        m_EarlyUpdate_Set.Add(updateSystem);
+                        m_EarlyUpdate_Array = m_EarlyUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.FixedUpdate:
                 {
-                    if (!m_FixedUpdate_List.Contains(updateSystem))
+                    if (!m_FixedUpdate_Set.Contains(updateSystem))
                     {
-                        m_FixedUpdate_List.Add(updateSystem);
-                        m_FixedUpdate_Array = m_FixedUpdate_List.ToArray();
+                        m_FixedUpdate_Set.Add(updateSystem);
+                        m_FixedUpdate_Array = m_FixedUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.PreUpdate:
                 {
-                    if (!m_PreUpdate_List.Contains(updateSystem))
+                    if (!m_PreUpdate_Set.Contains(updateSystem))
                     {
-                        m_PreUpdate_List.Add(updateSystem);
-                        m_PreUpdate_Array = m_PreUpdate_List.ToArray();
+                        m_PreUpdate_Set.Add(updateSystem);
+                        m_PreUpdate_Array = m_PreUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.Update:
                 {
-                    if (!m_Update_List.Contains(updateSystem))
+                    if (!m_Update_Set.Contains(updateSystem))
                     {
-                        m_Update_List.Add(updateSystem);
-                        m_Update_Array = m_Update_List.ToArray();
+                        m_Update_Set.Add(updateSystem);
+                        m_Update_Array = m_Update_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.PreLateUpdate:
                 {
-                    if (!m_PreLateUpdate_List.Contains(updateSystem))
+                    if (!m_PreLateUpdate_Set.Contains(updateSystem))
                     {
-                        m_PreLateUpdate_List.Add(updateSystem);
-                        m_PreLateUpdate_Array = m_PreLateUpdate_List.ToArray();
+                        m_PreLateUpdate_Set.Add(updateSystem);
+                        m_PreLateUpdate_Array = m_PreLateUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.PostLateUpdate:
                 {
-                    if (!m_PostLateUpdate_List.Contains(updateSystem))
+                    if (!m_PostLateUpdate_Set.Contains(updateSystem))
                     {
-                        m_PostLateUpdate_List.Add(updateSystem);
-                        m_PostLateUpdate_Array = m_PostLateUpdate_List.ToArray();
+                        m_PostLateUpdate_Set.Add(updateSystem);
+                        m_PostLateUpdate_Array = m_PostLateUpdate_Set.ToArray();
                     }
 
                     break;
@@ -355,70 +355,70 @@ namespace MLAPI
             {
                 case NetworkUpdateStage.Initialization:
                 {
-                    if (m_Initialization_List.Contains(updateSystem))
+                    if (m_Initialization_Set.Contains(updateSystem))
                     {
-                        m_Initialization_List.Remove(updateSystem);
-                        m_Initialization_Array = m_Initialization_List.ToArray();
+                        m_Initialization_Set.Remove(updateSystem);
+                        m_Initialization_Array = m_Initialization_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.EarlyUpdate:
                 {
-                    if (m_EarlyUpdate_List.Contains(updateSystem))
+                    if (m_EarlyUpdate_Set.Contains(updateSystem))
                     {
-                        m_EarlyUpdate_List.Remove(updateSystem);
-                        m_EarlyUpdate_Array = m_EarlyUpdate_List.ToArray();
+                        m_EarlyUpdate_Set.Remove(updateSystem);
+                        m_EarlyUpdate_Array = m_EarlyUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.FixedUpdate:
                 {
-                    if (m_FixedUpdate_List.Contains(updateSystem))
+                    if (m_FixedUpdate_Set.Contains(updateSystem))
                     {
-                        m_FixedUpdate_List.Remove(updateSystem);
-                        m_FixedUpdate_Array = m_FixedUpdate_List.ToArray();
+                        m_FixedUpdate_Set.Remove(updateSystem);
+                        m_FixedUpdate_Array = m_FixedUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.PreUpdate:
                 {
-                    if (m_PreUpdate_List.Contains(updateSystem))
+                    if (m_PreUpdate_Set.Contains(updateSystem))
                     {
-                        m_PreUpdate_List.Remove(updateSystem);
-                        m_PreUpdate_Array = m_PreUpdate_List.ToArray();
+                        m_PreUpdate_Set.Remove(updateSystem);
+                        m_PreUpdate_Array = m_PreUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.Update:
                 {
-                    if (m_Update_List.Contains(updateSystem))
+                    if (m_Update_Set.Contains(updateSystem))
                     {
-                        m_Update_List.Remove(updateSystem);
-                        m_Update_Array = m_Update_List.ToArray();
+                        m_Update_Set.Remove(updateSystem);
+                        m_Update_Array = m_Update_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.PreLateUpdate:
                 {
-                    if (m_PreLateUpdate_List.Contains(updateSystem))
+                    if (m_PreLateUpdate_Set.Contains(updateSystem))
                     {
-                        m_PreLateUpdate_List.Remove(updateSystem);
-                        m_PreLateUpdate_Array = m_PreLateUpdate_List.ToArray();
+                        m_PreLateUpdate_Set.Remove(updateSystem);
+                        m_PreLateUpdate_Array = m_PreLateUpdate_Set.ToArray();
                     }
 
                     break;
                 }
                 case NetworkUpdateStage.PostLateUpdate:
                 {
-                    if (m_PostLateUpdate_List.Contains(updateSystem))
+                    if (m_PostLateUpdate_Set.Contains(updateSystem))
                     {
-                        m_PostLateUpdate_List.Remove(updateSystem);
-                        m_PostLateUpdate_Array = m_PostLateUpdate_List.ToArray();
+                        m_PostLateUpdate_Set.Remove(updateSystem);
+                        m_PostLateUpdate_Array = m_PostLateUpdate_Set.ToArray();
                     }
 
                     break;
@@ -431,7 +431,7 @@ namespace MLAPI
         /// </summary>
         public static NetworkUpdateStage UpdateStage;
 
-        private static readonly List<INetworkUpdateSystem> m_Initialization_List = new List<INetworkUpdateSystem>();
+        private static readonly HashSet<INetworkUpdateSystem> m_Initialization_Set = new HashSet<INetworkUpdateSystem>();
         private static INetworkUpdateSystem[] m_Initialization_Array = new INetworkUpdateSystem[0];
 
         private static void RunNetworkInitialization()
@@ -444,7 +444,7 @@ namespace MLAPI
             }
         }
 
-        private static readonly List<INetworkUpdateSystem> m_EarlyUpdate_List = new List<INetworkUpdateSystem>();
+        private static readonly HashSet<INetworkUpdateSystem> m_EarlyUpdate_Set = new HashSet<INetworkUpdateSystem>();
         private static INetworkUpdateSystem[] m_EarlyUpdate_Array = new INetworkUpdateSystem[0];
 
         private static void RunNetworkEarlyUpdate()
@@ -457,7 +457,7 @@ namespace MLAPI
             }
         }
 
-        private static readonly List<INetworkUpdateSystem> m_FixedUpdate_List = new List<INetworkUpdateSystem>();
+        private static readonly HashSet<INetworkUpdateSystem> m_FixedUpdate_Set = new HashSet<INetworkUpdateSystem>();
         private static INetworkUpdateSystem[] m_FixedUpdate_Array = new INetworkUpdateSystem[0];
 
         private static void RunNetworkFixedUpdate()
@@ -470,7 +470,7 @@ namespace MLAPI
             }
         }
 
-        private static readonly List<INetworkUpdateSystem> m_PreUpdate_List = new List<INetworkUpdateSystem>();
+        private static readonly HashSet<INetworkUpdateSystem> m_PreUpdate_Set = new HashSet<INetworkUpdateSystem>();
         private static INetworkUpdateSystem[] m_PreUpdate_Array = new INetworkUpdateSystem[0];
 
         private static void RunNetworkPreUpdate()
@@ -483,7 +483,7 @@ namespace MLAPI
             }
         }
 
-        private static readonly List<INetworkUpdateSystem> m_Update_List = new List<INetworkUpdateSystem>();
+        private static readonly HashSet<INetworkUpdateSystem> m_Update_Set = new HashSet<INetworkUpdateSystem>();
         private static INetworkUpdateSystem[] m_Update_Array = new INetworkUpdateSystem[0];
 
         private static void RunNetworkUpdate()
@@ -496,7 +496,7 @@ namespace MLAPI
             }
         }
 
-        private static readonly List<INetworkUpdateSystem> m_PreLateUpdate_List = new List<INetworkUpdateSystem>();
+        private static readonly HashSet<INetworkUpdateSystem> m_PreLateUpdate_Set = new HashSet<INetworkUpdateSystem>();
         private static INetworkUpdateSystem[] m_PreLateUpdate_Array = new INetworkUpdateSystem[0];
 
         private static void RunNetworkPreLateUpdate()
@@ -509,7 +509,7 @@ namespace MLAPI
             }
         }
 
-        private static readonly List<INetworkUpdateSystem> m_PostLateUpdate_List = new List<INetworkUpdateSystem>();
+        private static readonly HashSet<INetworkUpdateSystem> m_PostLateUpdate_Set = new HashSet<INetworkUpdateSystem>();
         private static INetworkUpdateSystem[] m_PostLateUpdate_Array = new INetworkUpdateSystem[0];
 
         private static void RunNetworkPostLateUpdate()

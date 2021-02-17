@@ -47,25 +47,25 @@ public class NetLoopComp : MonoBehaviour, INetworkUpdateSystem
         switch (updateStage)
         {
             case NetworkUpdateStage.Initialization:
-                m_NetUpdates[0]++;
+                m_NetUpdates[0] += Time.frameCount;
                 break;
             case NetworkUpdateStage.EarlyUpdate:
-                m_NetUpdates[1]++;
+                m_NetUpdates[1] += Time.frameCount;
                 break;
             case NetworkUpdateStage.FixedUpdate:
-                m_NetUpdates[2]++;
+                m_NetUpdates[2] += Time.frameCount;
                 break;
             case NetworkUpdateStage.PreUpdate:
-                m_NetUpdates[3]++;
+                m_NetUpdates[3] += Time.frameCount;
                 break;
             case NetworkUpdateStage.Update:
-                m_NetUpdates[4]++;
+                m_NetUpdates[4] += Time.frameCount;
                 break;
             case NetworkUpdateStage.PreLateUpdate:
-                m_NetUpdates[5]++;
+                m_NetUpdates[5] += Time.frameCount;
                 break;
             case NetworkUpdateStage.PostLateUpdate:
-                m_NetUpdates[6]++;
+                m_NetUpdates[6] += Time.frameCount;
                 break;
         }
     }

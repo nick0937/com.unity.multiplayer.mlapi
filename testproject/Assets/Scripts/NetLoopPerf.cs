@@ -21,6 +21,16 @@ public class NetLoopPerf : MonoBehaviour
         {
             StartCoroutine(Benchmark(8 * 1024));
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            StartCoroutine(Benchmark(16 * 1024));
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            StartCoroutine(Benchmark(32 * 1024));
+        }
     }
 
     private IEnumerator Benchmark(int count)
@@ -53,14 +63,67 @@ public class NetLoopPerf : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         sw.Restart();
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 10; i++)
         {
             yield return new WaitForEndOfFrame();
         }
 
         sw.Stop();
-        print($"{nameof(NetLoopPerf)}.{nameof(Benchmark)} -> 8-frames: {sw.ElapsedMilliseconds}ms");
+        long t1 = sw.ElapsedMilliseconds;
+        print($"{nameof(NetLoopPerf)}.{nameof(Benchmark)} -> 10-frames: {t1}ms");
 
+        yield return new WaitForEndOfFrame();
+
+        sw.Restart();
+        for (int i = 0; i < 10; i++)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        sw.Stop();
+        long t2 = sw.ElapsedMilliseconds;
+        print($"{nameof(NetLoopPerf)}.{nameof(Benchmark)} -> 10-frames: {t2}ms");
+
+        yield return new WaitForEndOfFrame();
+
+        sw.Restart();
+        for (int i = 0; i < 10; i++)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        sw.Stop();
+        long t3 = sw.ElapsedMilliseconds;
+        print($"{nameof(NetLoopPerf)}.{nameof(Benchmark)} -> 10-frames: {t3}ms");
+
+        yield return new WaitForEndOfFrame();
+
+        sw.Restart();
+        for (int i = 0; i < 10; i++)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        sw.Stop();
+        long t4 = sw.ElapsedMilliseconds;
+        print($"{nameof(NetLoopPerf)}.{nameof(Benchmark)} -> 10-frames: {t4}ms");
+
+        yield return new WaitForEndOfFrame();
+
+        sw.Restart();
+        for (int i = 0; i < 10; i++)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        sw.Stop();
+        long t5 = sw.ElapsedMilliseconds;
+        print($"{nameof(NetLoopPerf)}.{nameof(Benchmark)} -> 10-frames: {t5}ms");
+
+        yield return new WaitForEndOfFrame();
+
+        print($"{nameof(NetLoopPerf)}.{nameof(Benchmark)} -> avg-frames: {(t1 + t2 + t3 + t4 + t5) / 5}ms");
+        
         yield return new WaitForEndOfFrame();
 
         sw.Restart();

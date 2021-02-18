@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define X
+#define Y
+
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,6 +37,19 @@ namespace MLAPI
     /// </summary>
     public static class NetworkUpdateLoop
     {
+        static NetworkUpdateLoop()
+        {
+            foreach (NetworkUpdateStage updateStage in Enum.GetValues(typeof(NetworkUpdateStage)))
+            {
+#if X
+                m_UpdateSystems_Dict.Add(updateStage, new HashSet<INetworkUpdateSystem>());
+#endif
+#if Y
+                m_UpdateSystems_Arr.Add(updateStage, new INetworkUpdateSystem[0]);
+#endif
+            }
+        }
+
         [RuntimeInitializeOnLoadMethod]
         private static void Initialize()
         {
@@ -176,12 +192,24 @@ namespace MLAPI
         /// </summary>
         public static void RegisterNetworkUpdate(this INetworkUpdateSystem updateSystem, NetworkUpdateStage updateStage = NetworkUpdateStage.Update)
         {
+#if X
+            if (!m_UpdateSystems_Dict[updateStage].Contains(updateSystem))
+            {
+                m_UpdateSystems_Dict[updateStage].Add(updateSystem);
+#if Y
+                m_UpdateSystems_Arr[updateStage] = m_UpdateSystems_Dict[updateStage].ToArray();
+#else
+                m_UpdateSystem_Arrays[(int)updateStage] = m_UpdateSystems_Dict[updateStage].ToArray();
+#endif
+            }
+#else
             int updateStageIndex = (int)updateStage;
             if (!m_UpdateSystem_Sets[updateStageIndex].Contains(updateSystem))
             {
                 m_UpdateSystem_Sets[updateStageIndex].Add(updateSystem);
                 m_UpdateSystem_Arrays[updateStageIndex] = m_UpdateSystem_Sets[updateStageIndex].ToArray();
             }
+#endif
         }
 
         /// <summary>
@@ -200,14 +228,29 @@ namespace MLAPI
         /// </summary>
         public static void UnregisterNetworkUpdate(this INetworkUpdateSystem updateSystem, NetworkUpdateStage updateStage = NetworkUpdateStage.Update)
         {
+#if X
+            if (m_UpdateSystems_Dict[updateStage].Contains(updateSystem))
+            {
+                m_UpdateSystems_Dict[updateStage].Remove(updateSystem);
+#if Y
+                m_UpdateSystems_Arr[updateStage] = m_UpdateSystems_Dict[updateStage].ToArray();
+#else
+                m_UpdateSystem_Arrays[(int)updateStage] = m_UpdateSystems_Dict[updateStage].ToArray();
+#endif
+            }
+#else
             int updateStageIndex = (int)updateStage;
             if (m_UpdateSystem_Sets[updateStageIndex].Contains(updateSystem))
             {
                 m_UpdateSystem_Sets[updateStageIndex].Remove(updateSystem);
                 m_UpdateSystem_Arrays[updateStageIndex] = m_UpdateSystem_Sets[updateStageIndex].ToArray();
             }
+#endif
         }
 
+#if X
+        private static readonly Dictionary<NetworkUpdateStage, HashSet<INetworkUpdateSystem>> m_UpdateSystems_Dict = new Dictionary<NetworkUpdateStage, HashSet<INetworkUpdateSystem>>();
+#else
         private static readonly HashSet<INetworkUpdateSystem>[] m_UpdateSystem_Sets =
         {
             new HashSet<INetworkUpdateSystem>(), // 0: Update
@@ -218,7 +261,11 @@ namespace MLAPI
             new HashSet<INetworkUpdateSystem>(), // 5: PreLateUpdate
             new HashSet<INetworkUpdateSystem>(), // 6: PostLateUpdate
         };
+#endif
 
+#if Y
+        private static readonly Dictionary<NetworkUpdateStage, INetworkUpdateSystem[]> m_UpdateSystems_Arr = new Dictionary<NetworkUpdateStage, INetworkUpdateSystem[]>();
+#else
         private static readonly INetworkUpdateSystem[][] m_UpdateSystem_Arrays =
         {
             new INetworkUpdateSystem[0], // 0: Update
@@ -229,16 +276,26 @@ namespace MLAPI
             new INetworkUpdateSystem[0], // 5: PreLateUpdate
             new INetworkUpdateSystem[0], // 6: PostLateUpdate
         };
+#endif
 
         private static void RunNetworkUpdateStage(NetworkUpdateStage updateStage)
         {
             UpdateStage = updateStage;
+#if Y
+            var updateSystemsArray = m_UpdateSystems_Arr[updateStage];
+            int arrayLength = updateSystemsArray.Length;
+            for (int i = 0; i < arrayLength; i++)
+            {
+                updateSystemsArray[i].NetworkUpdate(updateStage);
+            }
+#else
             int updateStageIndex = (int)updateStage;
             int arrayLength = m_UpdateSystem_Arrays[updateStageIndex].Length;
             for (int i = 0; i < arrayLength; i++)
             {
                 m_UpdateSystem_Arrays[updateStageIndex][i].NetworkUpdate(updateStage);
             }
+#endif
         }
 
         private struct NetworkInitialization

@@ -732,6 +732,10 @@ namespace MLAPI
         private void OnNetworkEarlyUpdate()
         {
             PerformanceDataManager.BeginNewTick();
+            if (NetworkConfig.NetworkTransport is ITransportProfilerData profileTransport)
+            {
+                profileTransport.BeginNewTick();
+            }
 
             if (IsListening)
             {

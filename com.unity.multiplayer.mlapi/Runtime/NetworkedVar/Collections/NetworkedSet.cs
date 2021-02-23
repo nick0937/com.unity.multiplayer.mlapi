@@ -14,6 +14,8 @@ namespace MLAPI.NetworkedVar.Collections
     /// <typeparam name="T">The type for the set</typeparam>
     public class NetworkedSet<T> : ISet<T>, INetworkedVar
     {
+        public virtual void Debug() { }
+
         private readonly ISet<T> set = new HashSet<T>();
         private readonly List<NetworkedSetEvent<T>> dirtyEvents = new List<NetworkedSetEvent<T>>();
         private NetworkedBehaviour networkedBehaviour;

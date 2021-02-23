@@ -19,6 +19,7 @@ using MLAPI.Spawning;
 using MLAPI.Transports;
 using BitStream = MLAPI.Serialization.BitStream;
 using Unity.Profiling;
+using Debug = UnityEngine.Debug;
 
 namespace MLAPI
 {
@@ -729,6 +730,7 @@ namespace MLAPI
                                 {
                                     using (PooledBitStream varStream = PooledBitStream.Get())
                                     {
+                                        networkedVarFields[k].Debug();
                                         networkedVarFields[k].WriteDelta(varStream);
                                         varStream.PadStream();
 
@@ -738,6 +740,7 @@ namespace MLAPI
                                 }
                                 else
                                 {
+                                    networkedVarFields[k].Debug();
                                     networkedVarFields[k].WriteDelta(stream);
                                 }
 

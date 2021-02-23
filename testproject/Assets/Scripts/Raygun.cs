@@ -36,11 +36,10 @@ public class Raygun : NetworkedBehaviour
         lineRenderer.SetPosition(0, transform.position);
         lineRenderer.SetPosition(1, transform.position + transform.forward * 10.0f);
 
-
-        if (IsLocalPlayer && Input.GetKey(KeyCode.P))
+        if (IsLocalPlayer && Input.GetKeyDown(KeyCode.P))
         {
             m_CurrentTarget = FindTarget();
-            m_CurrentTarget.transform.position = transform.position + transform.forward * 10.0f;
+            transform.position = m_CurrentTarget.transform.position + m_CurrentTarget.transform.forward * 10.0f;
         }
 
     }

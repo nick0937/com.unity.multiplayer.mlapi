@@ -14,6 +14,11 @@ public class PlayerMovement : NetworkedBehaviour
         var temp = transform.position;
         temp.y = 0.5f;
         transform.position = temp;
+
+        if (m_Rigidbody)
+        {
+            m_Rigidbody.isKinematic = !IsLocalPlayer;
+        }
     }
 
     private void FixedUpdate()

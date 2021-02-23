@@ -17,7 +17,7 @@ namespace MLAPI
         NetworkedVar<Quaternion> m_varRot = new NetworkedVar<Quaternion>();
         const float k_epsilon = 0.001f;
 
-        private bool interpolate = false;
+        private bool interpolate = true;
 
         // data structures for interpolation
         Vector3[] m_PosStore = new Vector3[2];
@@ -46,7 +46,11 @@ namespace MLAPI
                 m_PosStore[0] = m_PosStore[1];
                 m_PosStore[1] = after;
 
-                gameObject.transform.position = after;
+                if (!interpolate)
+                {
+                    gameObject.transform.position = after;
+                }
+                Debug.Log("[1] received position from " + before + " to " + after);
             }
         }
 
@@ -60,7 +64,11 @@ namespace MLAPI
                 m_RotStore[0] = m_RotStore[1];
                 m_RotStore[1] = after;
 
-                gameObject.transform.rotation = after;
+                if (!interpolate)
+                {
+                    gameObject.transform.rotation = after;
+                }
+                Debug.Log("[2] received rotation from " + before + " to " + after);
             }
         }
 
@@ -70,7 +78,7 @@ namespace MLAPI
             m_varRot.Settings.WritePermission = NetworkedVarPermission.Everyone;
         }
 
-        void Update()
+        void FixedUpdate()
         {
             float now = Time.time;
             if (m_lastSent == 0.0f)
@@ -91,13 +99,14 @@ namespace MLAPI
                     return;
                 }
 
-                // don't interpolate more than 1 tick forward
-                if ((now - m_PosTimes[0]) / (m_PosTimes[1] - m_PosTimes[0]) < 2.0)
+                // let's interpolate the last received transform
+                if (m_PosTimes[0] >= 0.0 && m_PosTimes[1] >= 0.0)
                 {
-                    // let's interpolate the last received transform
-                    if (m_PosTimes[0] >= 0.0 && m_PosTimes[1] >= 0.0)
+                    var before = gameObject.transform.position;
+
+                    if (m_PosTimes[1] - m_PosTimes[0] > k_epsilon)
                     {
-                        if (m_PosTimes[1] - m_PosTimes[0] > k_epsilon)
+                        if ((now - m_PosTimes[0]) / (m_PosTimes[1] - m_PosTimes[0]) < 2.0)
                         {
                             gameObject.transform.position = Vector3.LerpUnclamped(
                                 m_PosStore[0],
@@ -105,9 +114,23 @@ namespace MLAPI
                                 (now - m_PosTimes[0]) / (m_PosTimes[1] - m_PosTimes[0]));
                         }
                     }
-                    if (m_RotTimes[0] >= 0.0 && m_RotTimes[1] >= 0.0)
+                    else
                     {
-                        if (m_RotTimes[1] - m_RotTimes[0] > k_epsilon)
+                        gameObject.transform.position = m_PosStore[1];
+                    }
+
+                    var after = gameObject.transform.position;
+
+                    Debug.Log("[3] Updated position from " + before + " to " + after);
+                }
+
+                if (m_RotTimes[0] >= 0.0 && m_RotTimes[1] >= 0.0)
+                {
+                    var before = gameObject.transform.rotation;
+
+                    if (m_RotTimes[1] - m_RotTimes[0] > k_epsilon)
+                    {
+                        if ((now - m_RotTimes[0]) / (m_RotTimes[1] - m_RotTimes[0]) < 2.0)
                         {
                             gameObject.transform.rotation = Quaternion.SlerpUnclamped(
                                 m_RotStore[0],
@@ -115,13 +138,15 @@ namespace MLAPI
                                 (now - m_RotTimes[0]) / (m_RotTimes[1] - m_RotTimes[0]));
                         }
                     }
-                }
-                else
-                {
-                    gameObject.transform.position = m_PosStore[1];
-                    gameObject.transform.rotation = m_RotStore[1];
-                }
+                    else
+                    {
+                        gameObject.transform.rotation = m_RotStore[1];
+                    }
 
+                    var after = gameObject.transform.rotation;
+
+                    Debug.Log("[4] Updated rotation from " + before + " to " + after);
+                }
             }
         }
     }

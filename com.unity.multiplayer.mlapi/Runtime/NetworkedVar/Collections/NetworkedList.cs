@@ -4,6 +4,7 @@ using System.IO;
 using MLAPI.Serialization;
 using MLAPI.Serialization.Pooled;
 using MLAPI.Transports;
+using UnityEngine;
 
 namespace MLAPI.NetworkedVar.Collections
 {
@@ -13,6 +14,7 @@ namespace MLAPI.NetworkedVar.Collections
     /// <typeparam name="T">The type for the list</typeparam>
     public class NetworkedList<T> : IList<T>, INetworkedVar
     {
+        public virtual void Debug() { }
         private readonly IList<T> list = new List<T>();
         private readonly List<NetworkedListEvent<T>> dirtyEvents = new List<NetworkedListEvent<T>>();
         private NetworkedBehaviour networkedBehaviour;

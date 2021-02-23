@@ -14,6 +14,8 @@ namespace MLAPI.NetworkedVar.Collections
     /// <typeparam name="TValue">The type for the dictionary values</typeparam>
     public class NetworkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INetworkedVar
     {
+        public virtual void Debug() { }
+
         /// <summary>
         /// Gets the last time the variable was synced
         /// </summary>

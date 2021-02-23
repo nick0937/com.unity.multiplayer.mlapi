@@ -5,6 +5,7 @@ using System;
 using MLAPI.Logging;
 using MLAPI.Serialization.Pooled;
 using MLAPI.Transports;
+using UnityEngine;
 
 namespace MLAPI.NetworkedVar
 {
@@ -229,6 +230,11 @@ namespace MLAPI.NetworkedVar
         {
             return Settings.SendChannel;
         }
+
+        public virtual void Debug()
+        {
+            UnityEngine.Debug.Log("foo");
+        }
     }
 
     /// <summary>
@@ -445,6 +451,11 @@ namespace MLAPI.NetworkedVar
     [Serializable]
     public class NetworkedVarVector3 : NetworkedVar<Vector3>
     {
+        public virtual void Debug()
+        {
+            UnityEngine.Debug.Log("[5] sending position " + Value);
+        }
+
         /// <inheritdoc />
         public NetworkedVarVector3() { }
         /// <inheritdoc />
@@ -525,6 +536,11 @@ namespace MLAPI.NetworkedVar
     [Serializable]
     public class NetworkedVarQuaternion : NetworkedVar<Quaternion>
     {
+        public override void Debug()
+        {
+            UnityEngine.Debug.Log("[6] sending rotation " + Value);
+        }
+
         /// <inheritdoc />
         public NetworkedVarQuaternion() { }
         /// <inheritdoc />
